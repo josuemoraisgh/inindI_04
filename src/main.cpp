@@ -1,27 +1,28 @@
 #include <Arduino.h>
 #include "inindThread.h"
 
-#define LEDPIN 3         // the number of the LED pin
-#define LED_INTERVAL 500 // interval at which to blink (milliseconds)
-#define GridFreq 100     // Nominal Grid Frequency in Hz
-#define Fs 10000         // Sampling frequency = 10Khz
-#define Tfinal 0.1       // Time the simulation
-#define AMPLITUDE 10     // Amplitude da Onda
+#define LEDPIN 3           // the number of the LED pin
+#define LED_INTERVAL 500.0 // interval at which to blink (milliseconds)
+#define GridFreq 1.0       // Nominal Grid Frequency in Hz
+#define Fs 1000.0          // Sampling frequency = 1Khz
+#define Tfinal 0.1         // Time the simulation
+#define AMPLITUDE 10       // Amplitude da Onda
 
 // Variaveis calculadas
-#define T 1 / GridFreq     // Periodo do Sinal
-#define Ts 1 / Fs          // Sampling Time = 1/Fs
-#define w 2 * pi *GridFreq // Frequencia Angular
+const double T = (1.0 / GridFreq); // Periodo do Sinal
+const double Ts = (1.0 / Fs);      // Sampling Time = 1/Fs
 
 double onda = 0;
-unsigned long count = 0;
+double timeStamp = 0;
+double aux = 0;
 
-void ledFunc()
+void OndaFunc()
 {
-  count += Ts;
-  onda = (AMPLITUDE / T) * (count % T); // y = m*x onde m = A/T e x = n % T
+  aux = (aux <= T + Ts ? aux + Ts : 0);
+  timeStamp += (Ts * 1000);
+  onda = (AMPLITUDE / T) * aux; // y = m*x onde m = A/T e x = n % T
   Serial.print(">onda:");
-  Serial.print(count);
+  Serial.print(timeStamp);
   Serial.print(":");
   Serial.print(onda);
   Serial.println("§Volts|g");
@@ -36,7 +37,7 @@ void setup()
 {
   pinMode(LEDPIN, OUTPUT);
   Serial.begin(115200);
-  threadSetup(ledFunc, LED_INTERVAL, NULL);
+  threadSetup(ledFunc, LED_INTERVAL, OndaFunc, (int)(Ts * 1000), NULL);
 }
 
 void loop()
