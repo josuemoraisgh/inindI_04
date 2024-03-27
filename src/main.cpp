@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#define NUMTHREADS 2 //Deve-se sempre declarar o NUMTHREADS antes de "inindThread.h"
 #include "inindThread.h"
 
 #define LEDPIN 3           // the number of the LED pin
@@ -37,7 +38,7 @@ void setup()
 {
   pinMode(LEDPIN, OUTPUT);
   Serial.begin(115200);
-  threadSetup(ledFunc, LED_INTERVAL, OndaFunc, (int)(Ts * 1000), NULL);
+  threadSetup(ledFunc, LED_INTERVAL, OndaFunc, (int)(Ts * 1000));
 }
 
 void loop()
